@@ -1,2 +1,4 @@
 temp/
 tests/
+**/__pycache__
+**/.idea
