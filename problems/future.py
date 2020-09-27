@@ -120,7 +120,7 @@ class Future:
             res = self.__exception()
             if res:
                 return res
-            self._done_condition.wait()
+            self._done_condition.wait(timeout)
             if timeout and start_time + timeout < time():
                 raise TimeoutError()
             return self.__exception()
