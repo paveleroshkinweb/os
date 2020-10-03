@@ -1,4 +1,3 @@
-import subprocess
 import signal
 import os
 import sys
@@ -6,13 +5,11 @@ import io
 from contextlib import suppress
 
 
-PIPE = -1
-STDOUT = -2
-DEVNULL = -3
-
-
-
 class Popen:
+
+    PIPE = -1
+    STDOUT = -2
+    DEVNULL = -3
 
     def __init__(self, args, *, stdin=None, stdout=None, 
                 stderr=None, shell=False, cwd=None):
@@ -33,15 +30,14 @@ class Popen:
     def _get_handler(self, prop, index):
         handlers = [-1, -1]
         if prop is not None:
-            if prop == PIPE:
+            if prop == Popen.PIPE:
                 handlers = os.pipe()
-            elif prop == DEVNULL:
+            elif prop == Popen.DEVNULL:
                 handlers[index] = self._devnull
             elif isinstance(prop, int) and prop >= 0:
                 handlers[index] = prop
-            else:
-                with suppress(Exception):
-                    handlers[index] = prop.fileno()
+            elif hasattr(prop, 'fileno'):
+                handlers[index] = prop.fileno()
         return handlers
         
 
@@ -49,7 +45,7 @@ class Popen:
         inread, inwrite = self._get_handler(self._stdin, 0)
         outread, outwrite = self._get_handler(self._stdout, 1)
         errread, errwrite = self._get_handler(self._stderr, 1)
-        if errwrite == -1 and self._stderr == STDOUT:
+        if errwrite == -1 and self._stderr == Popen.STDOUT:
             if outwrite != -1:
                 errwrite = outwrite
             else:
@@ -95,7 +91,7 @@ class Popen:
 
     def communicate(self, input_to_send=None):
         stdout = stderr = None
-        if input_to_send:
+        if input_to_send and self.inwrite:
             self.inwrite.write(input_to_send)
             self.inwrite.close()
         if self.outread:
