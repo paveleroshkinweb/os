@@ -109,9 +109,7 @@ class Popen:
 
     def poll(self):
         """Check if child process has terminated. Set and return returncode attribute."""
-        if self.returncode is None:
-            return self.wait()
-        return self.returncode
+        return self.wait()
 
     def wait(self):
         """Wait for child process to terminate; returns self.returncode."""
@@ -119,6 +117,7 @@ class Popen:
             pid, code = os.wait()
             self.returncode = code
             return code
+        return self.returncode
 
     def send_signal(self, sig):
         if self.returncode is None:
