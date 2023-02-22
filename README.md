@@ -1,2 +1,2 @@
 # OS
-Repo with simple os problems
+Implementation of different OS primitives written in Python.
